@@ -1,0 +1,361 @@
+/* ==============================
+   CV PREVIEW PAGE
+   ============================== */
+
+.cv-preview-page {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  width: 100%;
+  height: 100vh;
+
+  overflow-y: auto;
+
+  background: #525659;
+
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+
+/* ==============================
+   PREVIEW TOOLBAR
+   ============================== */
+
+.cv-toolbar {
+  width: 210mm;
+  margin: 0 auto 15px auto;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.cv-toolbar button {
+  padding: 10px 18px;
+
+  border: none;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #222;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cv-toolbar button:hover {
+  background: #f0f0f0;
+}
+
+
+/* ==============================
+   A4 CV PAPER
+   ============================== */
+
+.cv-paper {
+  width: 210mm;
+  min-height: 297mm;
+
+  margin: 0 auto;
+
+  padding: 16mm 15mm;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  color: #111111;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+
+/* ==============================
+   HEADER
+   ============================== */
+
+.cv-header {
+  text-align: center;
+
+  padding-bottom: 12px;
+
+  border-bottom: 2px solid #111;
+}
+
+.cv-name {
+  margin: 0;
+
+  font-size: 25px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+.cv-job-title {
+  margin-top: 5px;
+
+  font-size: 14px;
+
+  color: #333;
+}
+
+.cv-contact {
+  margin-top: 8px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  font-size: 10px;
+
+  color: #333;
+}
+
+.cv-contact span {
+  white-space: nowrap;
+}
+
+
+/* ==============================
+   SECTIONS
+   ============================== */
+
+.cv-section {
+  margin-top: 18px;
+}
+
+.cv-section-title {
+  margin: 0 0 9px 0;
+
+  padding-bottom: 5px;
+
+  border-bottom: 1px solid #cfcfcf;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+
+/* ==============================
+   PROFESSIONAL SUMMARY
+   ============================== */
+
+.cv-summary {
+  font-size: 10.5px;
+
+  line-height: 1.55;
+
+  text-align: left;
+
+  margin: 0;
+}
+
+
+/* ==============================
+   EXPERIENCE
+   ============================== */
+
+.cv-experience {
+  margin-bottom: 14px;
+}
+
+.cv-experience-header {
+  margin-bottom: 5px;
+}
+
+.cv-job-title {
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.cv-company {
+  margin-top: 2px;
+
+  font-size: 10.5px;
+
+  font-weight: 600;
+}
+
+.cv-dates {
+  margin-top: 2px;
+
+  font-size: 9.5px;
+
+  color: #444;
+}
+
+.cv-description {
+  margin-top: 7px;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+
+/* ==============================
+   EDUCATION
+   ============================== */
+
+.cv-education {
+  margin-bottom: 12px;
+}
+
+.cv-qualification {
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.cv-institution {
+  margin-top: 2px;
+
+  font-size: 10px;
+}
+
+.cv-year {
+  margin-top: 2px;
+
+  font-size: 9.5px;
+
+  color: #444;
+}
+
+
+/* ==============================
+   ACHIEVEMENTS
+   ============================== */
+
+.cv-achievements {
+  font-size: 10px;
+
+  line-height: 1.55;
+
+  white-space: pre-line;
+}
+
+
+/* ==============================
+   ADDITIONAL INFORMATION
+   ============================== */
+
+.cv-additional {
+  font-size: 10px;
+
+  line-height: 1.55;
+
+  white-space: pre-line;
+}
+
+
+/* ==============================
+   MOBILE PREVIEW
+   ============================== */
+
+@media screen and (max-width: 900px) {
+  .cv-preview-page {
+    padding: 10px;
+  }
+
+  .cv-toolbar {
+    width: 100%;
+  }
+
+  .cv-paper {
+    width: 100%;
+    min-height: auto;
+
+    padding: 30px 25px;
+  }
+}
+
+
+/* ==============================
+   PRINT / PDF
+   ============================== */
+
+@media print {
+
+  /* Hide everything except the CV */
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: white !important;
+  }
+
+  /* Hide application navigation */
+
+  .navbar,
+  nav {
+    display: none !important;
+  }
+
+  /* Hide preview buttons */
+
+  .cv-toolbar {
+    display: none !important;
+  }
+
+  /* Remove preview background */
+
+  .cv-preview-page {
+    position: static !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    min-height: 0 !important;
+
+    padding: 0 !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+
+    background: white !important;
+  }
+
+  /* A4 paper */
+
+  .cv-paper {
+    width: 210mm !important;
+    min-height: 297mm !important;
+
+    margin: 0 !important;
+
+    padding: 16mm 15mm !important;
+
+    box-shadow: none !important;
+
+    background: white !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}
+.cv-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

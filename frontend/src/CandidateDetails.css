@@ -1,0 +1,341 @@
+.details-page {
+  min-height: calc(100vh - 64px);
+
+  background: #f5f7fb;
+
+  color: #1f2937;
+}
+
+.details-header {
+  background: white;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  padding: 18px 40px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+}
+
+.back-button {
+  border: none;
+
+  background: transparent;
+
+  color: #2563eb;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  padding: 8px 0;
+}
+
+.back-button:hover {
+  color: #1d4ed8;
+}
+
+.candidate-number {
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+.details-container {
+  max-width: 1000px;
+
+  margin: auto;
+
+  padding: 35px 30px 60px;
+}
+
+.details-title {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 25px;
+}
+
+.details-title h1 {
+  margin: 0;
+
+  font-size: 28px;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.details-title p {
+  margin: 5px 0 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+.status-select {
+  border: 1px solid #d1d5db;
+
+  background: white;
+
+  padding: 10px 14px;
+
+  border-radius: 7px;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+.details-success {
+  background: #dcfce7;
+
+  color: #166534;
+
+  padding: 12px 15px;
+
+  border-radius: 7px;
+
+  margin-bottom: 20px;
+
+  font-size: 14px;
+}
+
+.details-error {
+  background: #fee2e2;
+
+  color: #b91c1c;
+
+  padding: 12px 15px;
+
+  border-radius: 7px;
+
+  margin-bottom: 20px;
+
+  font-size: 14px;
+}
+
+.details-section {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  padding: 25px;
+
+  margin-bottom: 20px;
+}
+
+.details-section h2 {
+  margin: 0 0 20px;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.details-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+.details-field {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.details-field.full-width {
+  margin-top: 20px;
+}
+
+.details-field label {
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #374151;
+}
+
+.details-field input,
+.details-field textarea {
+  width: 100%;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 7px;
+
+  padding: 10px 12px;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  color: #111827;
+
+  background: white;
+
+  outline: none;
+}
+
+.details-field input:focus,
+.details-field textarea:focus {
+  border-color: #2563eb;
+}
+
+.details-field textarea {
+  resize: vertical;
+
+  line-height: 1.5;
+}
+
+.ai-section {
+  background: #f8fafc;
+}
+
+.ai-description {
+  margin-top: -10px;
+
+  margin-bottom: 15px;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
+.ai-summary {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 7px;
+
+  padding: 16px;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+  color: #374151;
+}
+
+.details-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 12px;
+
+  margin-top: 10px;
+}
+
+.cancel-button,
+.preview-button,
+.save-button {
+  padding: 11px 20px;
+
+  border-radius: 7px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cancel-button {
+  border: 1px solid #d1d5db;
+
+  background: white;
+
+  color: #374151;
+}
+
+.cancel-button:hover {
+  background: #f9fafb;
+}
+
+.preview-button {
+  border: 1px solid #2563eb;
+
+  background: white;
+
+  color: #2563eb;
+}
+
+.preview-button:hover {
+  background: #eff6ff;
+}
+
+.save-button {
+  border: none;
+
+  background: #2563eb;
+
+  color: white;
+}
+
+.save-button:hover {
+  background: #1d4ed8;
+}
+
+.save-button:disabled {
+  opacity: 0.7;
+
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+
+  .details-header {
+    padding: 16px 20px;
+  }
+
+  .details-container {
+    padding: 25px 20px 50px;
+  }
+
+  .details-title {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 15px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-section {
+    padding: 20px;
+  }
+
+  .details-actions {
+    flex-direction: column;
+  }
+
+  .cancel-button,
+  .preview-button,
+  .save-button {
+    width: 100%;
+  }
+}
