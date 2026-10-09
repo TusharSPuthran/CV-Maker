@@ -12,57 +12,30 @@ function CVPreview({
 
   return (
     <div className="cv-preview-page">
-
-      {/* =========================
-          PREVIEW TOOLBAR
-          ========================= */}
-
+      {/* Preview Toolbar */}
       <div className="cv-toolbar">
-
-        <button
-          onClick={onBack}
-        >
+        <button onClick={onBack}>
           ← Back to Candidates
         </button>
 
-
         <div className="cv-toolbar-right">
-
-          <button
-            onClick={onEdit}
-          >
+          <button onClick={onEdit}>
             Edit Candidate
           </button>
 
-
-          <button
-            onClick={handlePrint}
-          >
+          <button onClick={handlePrint}>
             Generate PDF
           </button>
-
         </div>
-
       </div>
 
-
-      {/* =========================
-          CV PAPER
-          ========================= */}
-
+      {/* CV Paper */}
       <div className="cv-paper">
-
-        {/* =========================
-            HEADER
-            ========================= */}
-
+        {/* Header */}
         <header className="cv-header">
-
           <h1 className="cv-name">
-            {candidate.fullName ||
-              "Candidate Name"}
+            {candidate.fullName || "Candidate Name"}
           </h1>
-
 
           {candidate.jobTitle && (
             <div className="cv-job-title">
@@ -70,78 +43,37 @@ function CVPreview({
             </div>
           )}
 
-
           <div className="cv-contact">
-
             {candidate.phone && (
-              <span>
-                {candidate.phone}
-              </span>
+              <span>{candidate.phone}</span>
             )}
 
             {candidate.email && (
-              <span>
-                {candidate.email}
-              </span>
+              <span>{candidate.email}</span>
             )}
 
             {candidate.location && (
-              <span>
-                {candidate.location}
-              </span>
+              <span>{candidate.location}</span>
             )}
-
           </div>
-
         </header>
 
-
-        {/* =========================
-            PROFESSIONAL SUMMARY
-            ========================= */}
-
-        {candidate.aiSummary && (
-
-          <section className="cv-section">
-
-            <h2 className="cv-section-title">
-              Professional Summary
-            </h2>
-
-            <p className="cv-summary">
-              {candidate.aiSummary}
-            </p>
-
-          </section>
-
-        )}
-
-
-        {/* =========================
-            EXPERIENCE
-            ========================= */}
-
+        {/* Experience */}
         {(candidate.company ||
           candidate.jobTitle ||
           candidate.experience) && (
-
           <section className="cv-section">
-
             <h2 className="cv-section-title">
               Experience
             </h2>
 
-
             <div className="cv-experience">
-
               <div className="cv-experience-header">
-
                 {candidate.jobTitle && (
                   <div className="cv-job-title">
                     {candidate.jobTitle}
                   </div>
                 )}
-
 
                 {candidate.company && (
                   <div className="cv-company">
@@ -149,12 +81,9 @@ function CVPreview({
                   </div>
                 )}
 
-
                 {(candidate.startDate ||
                   candidate.endDate) && (
-
                   <div className="cv-dates">
-
                     {candidate.startDate || ""}
 
                     {candidate.startDate &&
@@ -163,124 +92,76 @@ function CVPreview({
                       : ""}
 
                     {candidate.endDate || ""}
-
                   </div>
-
                 )}
-
               </div>
-
 
               {candidate.experience && (
                 <div className="cv-description">
                   {candidate.experience}
                 </div>
               )}
-
             </div>
-
           </section>
-
         )}
 
-
-        {/* =========================
-            EDUCATION
-            ========================= */}
-
+        {/* Education */}
         {(candidate.qualification ||
           candidate.institution ||
           candidate.year) && (
-
           <section className="cv-section">
-
             <h2 className="cv-section-title">
               Education
             </h2>
 
-
             <div className="cv-education">
-
               {candidate.qualification && (
                 <div className="cv-qualification">
-                  {
-                    candidate.qualification
-                  }
+                  {candidate.qualification}
                 </div>
               )}
-
 
               {candidate.institution && (
                 <div className="cv-institution">
-                  {
-                    candidate.institution
-                  }
+                  {candidate.institution}
                 </div>
               )}
-
 
               {candidate.year && (
                 <div className="cv-year">
                   {candidate.year}
                 </div>
               )}
-
             </div>
-
           </section>
-
         )}
 
-
-        {/* =========================
-            ACHIEVEMENTS
-            ========================= */}
-
+        {/* Achievements */}
         {candidate.achievements && (
-
           <section className="cv-section">
-
             <h2 className="cv-section-title">
               Achievements
             </h2>
 
-
             <div className="cv-achievements">
-              {
-                candidate.achievements
-              }
+              {candidate.achievements}
             </div>
-
           </section>
-
         )}
 
-
-        {/* =========================
-            ADDITIONAL INFORMATION
-            ========================= */}
-
+        {/* Additional Information */}
         {candidate.additionalInfo && (
-
           <section className="cv-section">
-
             <h2 className="cv-section-title">
               Additional Information
             </h2>
 
-
             <div className="cv-additional">
-              {
-                candidate.additionalInfo
-              }
+              {candidate.additionalInfo}
             </div>
-
           </section>
-
         )}
-
       </div>
-
     </div>
   );
 }

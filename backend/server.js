@@ -1,24 +1,25 @@
+
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { google } = require("googleapis");
+const path = require("path");
 
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
 app.use(cors());
 app.use(express.json());
-
-const PORT = process.env.PORT || 5000;
-const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
 // ======================================================
 // GOOGLE SHEETS AUTHENTICATION
 // ======================================================
 
 const auth = new google.auth.GoogleAuth({
-  keyFile: "credentials.json",
+  keyFile: path.join(__dirname, "credentials.json"),
   scopes: [
     "https://www.googleapis.com/auth/spreadsheets",
   ],
@@ -30,11 +31,58 @@ const sheets = google.sheets({
 });
 
 // ======================================================
+// HELPERS
+// ======================================================
+
+async function getSheetRows() {
+  if (!SPREADSHEET_ID) {
+    throw new Error("SPREADSHEET_ID is missing from .env");
+  }
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: "Sheet1!A:S",
+  });
+
+  return response.data.values || [];
+}
+
+function rowToCandidate(row, fallbackId = "") {
+  return {
+    candidateId: row[0] || fallbackId,
+    submissionDate: row[1] || "",
+
+    fullName: row[2] || "",
+    phone: row[3] || "",
+    email: row[4] || "",
+    location: row[5] || "",
+
+    qualification: row[6] || "",
+    institution: row[7] || "",
+    year: row[8] || "",
+
+    company: row[9] || "",
+    jobTitle: row[10] || "",
+    startDate: row[11] || "",
+    endDate: row[12] || "",
+    experience: row[13] || "",
+
+    achievements: row[14] || "",
+    additionalInfo: row[15] || "",
+
+    // AI summary is no longer used.
+    status: row[17] || "Pending",
+    recruiterNotes: row[18] || "",
+  };
+}
+
+// ======================================================
 // HOME
 // ======================================================
 
 app.get("/", (req, res) => {
   res.json({
+    success: true,
     message: "CV Maker backend is running",
   });
 });
@@ -45,62 +93,18 @@ app.get("/", (req, res) => {
 
 app.get("/api/candidates", async (req, res) => {
   try {
-    const response =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId: SPREADSHEET_ID,
-        range: "Sheet1!A:S",
-      });
+    const rows = await getSheetRows();
 
-    const rows = response.data.values || [];
-
-    if (rows.length <= 1) {
-      return res.json({
-        success: true,
-        candidates: [],
-      });
-    }
-
-    const candidateRows = rows.slice(1);
-
-    const candidates = candidateRows.map(
-      (row, index) => ({
-        candidateId: row[0] || index + 1,
-        submissionDate: row[1] || "",
-
-        fullName: row[2] || "",
-        phone: row[3] || "",
-        email: row[4] || "",
-        location: row[5] || "",
-
-        qualification: row[6] || "",
-        institution: row[7] || "",
-        year: row[8] || "",
-
-        company: row[9] || "",
-        jobTitle: row[10] || "",
-        startDate: row[11] || "",
-        endDate: row[12] || "",
-        experience: row[13] || "",
-
-        achievements: row[14] || "",
-        additionalInfo: row[15] || "",
-
-        aiSummary: row[16] || "",
-        status: row[17] || "Pending",
-        recruiterNotes: row[18] || "",
-      })
+    const candidates = rows.slice(1).map((row, index) =>
+      rowToCandidate(row, index + 1)
     );
 
     res.json({
       success: true,
       candidates,
     });
-
   } catch (error) {
-    console.error(
-      "Error fetching candidates:",
-      error
-    );
+    console.error("Error fetching candidates:", error);
 
     res.status(500).json({
       success: false,
@@ -111,25 +115,17 @@ app.get("/api/candidates", async (req, res) => {
 });
 
 // ======================================================
-// GET SINGLE CANDIDATE
+// GET ONE CANDIDATE
 // ======================================================
 
 app.get("/api/candidates/:id", async (req, res) => {
   try {
     const candidateId = String(req.params.id);
-
-    const response =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId: SPREADSHEET_ID,
-        range: "Sheet1!A:S",
-      });
-
-    const rows = response.data.values || [];
+    const rows = await getSheetRows();
 
     const rowIndex = rows.findIndex(
       (row, index) =>
-        index > 0 &&
-        String(row[0]) === candidateId
+        index > 0 && String(row[0]) === candidateId
     );
 
     if (rowIndex === -1) {
@@ -139,45 +135,12 @@ app.get("/api/candidates/:id", async (req, res) => {
       });
     }
 
-    const row = rows[rowIndex];
-
-    const candidate = {
-      candidateId: row[0] || "",
-      submissionDate: row[1] || "",
-
-      fullName: row[2] || "",
-      phone: row[3] || "",
-      email: row[4] || "",
-      location: row[5] || "",
-
-      qualification: row[6] || "",
-      institution: row[7] || "",
-      year: row[8] || "",
-
-      company: row[9] || "",
-      jobTitle: row[10] || "",
-      startDate: row[11] || "",
-      endDate: row[12] || "",
-      experience: row[13] || "",
-
-      achievements: row[14] || "",
-      additionalInfo: row[15] || "",
-
-      aiSummary: row[16] || "",
-      status: row[17] || "Pending",
-      recruiterNotes: row[18] || "",
-    };
-
     res.json({
       success: true,
-      candidate,
+      candidate: rowToCandidate(rows[rowIndex]),
     });
-
   } catch (error) {
-    console.error(
-      "Error fetching candidate:",
-      error
-    );
+    console.error("Error fetching candidate:", error);
 
     res.status(500).json({
       success: false,
@@ -194,50 +157,11 @@ app.get("/api/candidates/:id", async (req, res) => {
 app.put("/api/candidates/:id", async (req, res) => {
   try {
     const candidateId = String(req.params.id);
-
-    const {
-      fullName,
-      phone,
-      email,
-      location,
-
-      qualification,
-      institution,
-      year,
-
-      company,
-      jobTitle,
-      startDate,
-      endDate,
-      experience,
-
-      achievements,
-      additionalInfo,
-
-      status,
-      recruiterNotes,
-    } = req.body;
-
-    // ==================================================
-    // GET CURRENT SHEET
-    // ==================================================
-
-    const response =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId: SPREADSHEET_ID,
-        range: "Sheet1!A:S",
-      });
-
-    const rows = response.data.values || [];
-
-    // ==================================================
-    // FIND CANDIDATE
-    // ==================================================
+    const rows = await getSheetRows();
 
     const rowIndex = rows.findIndex(
       (row, index) =>
-        index > 0 &&
-        String(row[0]) === candidateId
+        index > 0 && String(row[0]) === candidateId
     );
 
     if (rowIndex === -1) {
@@ -247,81 +171,56 @@ app.put("/api/candidates/:id", async (req, res) => {
       });
     }
 
-    // Google Sheets row number
-    const sheetRow = rowIndex + 1;
-
     const existingRow = rows[rowIndex];
+    const sheetRow = rowIndex + 1;
+    const body = req.body;
 
-    // Preserve original values
-    const submissionDate =
-      existingRow[1] || "";
-
-    const aiSummary =
-      existingRow[16] || "";
-
-    // ==================================================
-    // CREATE UPDATED ROW
-    // ==================================================
-
+    // Preserve the ID, submission date and existing column Q.
+    // Column Q is retained for compatibility with the current sheet.
     const updatedRow = [
       candidateId,
-      submissionDate,
+      existingRow[1] || "",
 
-      fullName || "",
-      phone || "",
-      email || "",
-      location || "",
+      body.fullName ?? existingRow[2] ?? "",
+      body.phone ?? existingRow[3] ?? "",
+      body.email ?? existingRow[4] ?? "",
+      body.location ?? existingRow[5] ?? "",
 
-      qualification || "",
-      institution || "",
-      year || "",
+      body.qualification ?? existingRow[6] ?? "",
+      body.institution ?? existingRow[7] ?? "",
+      body.year ?? existingRow[8] ?? "",
 
-      company || "",
-      jobTitle || "",
-      startDate || "",
-      endDate || "",
-      experience || "",
+      body.company ?? existingRow[9] ?? "",
+      body.jobTitle ?? existingRow[10] ?? "",
+      body.startDate ?? existingRow[11] ?? "",
+      body.endDate ?? existingRow[12] ?? "",
+      body.experience ?? existingRow[13] ?? "",
 
-      achievements || "",
-      additionalInfo || "",
+      body.achievements ?? existingRow[14] ?? "",
+      body.additionalInfo ?? existingRow[15] ?? "",
 
-      aiSummary,
-
-      status || "Pending",
-
-      recruiterNotes || "",
+      existingRow[16] || "",
+      body.status ?? existingRow[17] ?? "Pending",
+      body.recruiterNotes ?? existingRow[18] ?? "",
     ];
-
-    // ==================================================
-    // UPDATE GOOGLE SHEETS
-    // ==================================================
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-
       range: `Sheet1!A${sheetRow}:S${sheetRow}`,
-
       valueInputOption: "USER_ENTERED",
-
       requestBody: {
         values: [updatedRow],
       },
     });
 
-    console.log(
-      `Candidate ${candidateId} updated successfully`
-    );
+    console.log(`Candidate ${candidateId} updated`);
 
     res.json({
       success: true,
       message: "Candidate updated successfully",
     });
-
   } catch (error) {
-    console.error(
-      "Candidate update error:",
-      error
-    );
+    console.error("Candidate update error:", error);
 
     res.status(500).json({
       success: false,
@@ -332,93 +231,7 @@ app.put("/api/candidates/:id", async (req, res) => {
 });
 
 // ======================================================
-// GENERATE AI SUMMARY USING OLLAMA
-// ======================================================
-
-async function generateAISummary(candidate) {
-  const prompt = `
-You are helping generate a professional CV.
-
-Create a short professional CV summary using ONLY the information provided below.
-
-IMPORTANT RULES:
-
-- Do not invent information.
-- Do not add skills that are not mentioned.
-- Do not add experience that is not mentioned.
-- Do not change facts.
-- Do not exaggerate the candidate's experience.
-- Keep the summary concise.
-- Write approximately 2 to 4 sentences.
-- If information is limited, create a simple summary.
-- Do not mention information that is not provided.
-- Return ONLY the CV summary.
-- Do not include headings such as "Summary:".
-
-Candidate Information:
-
-Name:
-${candidate.fullName || "Not provided"}
-
-Qualification:
-${candidate.qualification || "Not provided"}
-
-Institution:
-${candidate.institution || "Not provided"}
-
-Year of Passing:
-${candidate.year || "Not provided"}
-
-Company:
-${candidate.company || "Not provided"}
-
-Job Title:
-${candidate.jobTitle || "Not provided"}
-
-Experience:
-${candidate.experience || "Not provided"}
-
-Achievements:
-${candidate.achievements || "Not provided"}
-
-Additional Information:
-${candidate.additionalInfo || "Not provided"}
-`;
-
-  const response = await fetch(
-    "http://localhost:11434/api/generate",
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify({
-        model: "qwen2.5:3b",
-        prompt: prompt,
-        stream: false,
-
-        options: {
-          temperature: 0.2,
-        },
-      }),
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Ollama returned HTTP ${response.status}`
-    );
-  }
-
-  const data = await response.json();
-
-  return data.response?.trim() || "";
-}
-
-// ======================================================
-// SUBMIT CANDIDATE
+// SUBMIT CANDIDATE — NO AI PROCESSING
 // ======================================================
 
 app.post("/api/candidates", async (req, res) => {
@@ -443,206 +256,107 @@ app.post("/api/candidates", async (req, res) => {
       additionalInfo,
     } = req.body;
 
-    // ==================================================
-    // CANDIDATE OBJECT
-    // ==================================================
-
     const candidate = {
-      fullName,
-      phone,
-      email,
-      location,
+      fullName: fullName ?? "",
+      phone: phone ?? "",
+      email: email ?? "",
+      location: location ?? "",
 
-      qualification,
-      institution,
-      year,
+      qualification: qualification ?? "",
+      institution: institution ?? "",
+      year: year ?? "",
 
-      company,
-      jobTitle,
-      startDate,
-      endDate,
-      experience,
+      company: company ?? "",
+      jobTitle: jobTitle ?? "",
+      startDate: startDate ?? "",
+      endDate: endDate ?? "",
+      experience: experience ?? "",
 
-      achievements,
-      additionalInfo,
+      achievements: achievements ?? "",
+      additionalInfo: additionalInfo ?? "",
     };
 
-    // ==================================================
-    // GET EXISTING CANDIDATES
-    // ==================================================
+    // Read existing IDs.
+    const idResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: "Sheet1!A:A",
+    });
 
-    const existingData =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId: SPREADSHEET_ID,
-        range: "Sheet1!A:A",
-      });
+    const idRows = idResponse.data.values || [];
 
-    const rows =
-      existingData.data.values || [];
-
-    // ==================================================
-    // GENERATE CANDIDATE ID
-    // ==================================================
-
-    const candidateId = Math.max(
-      rows.length,
-      1
-    );
-
-    // ==================================================
-    // DETERMINE SHEET ROW
-    // ==================================================
-
-    const sheetRow =
-      rows.length + 1;
-
-    // ==================================================
-    // SUBMISSION DATE
-    // ==================================================
-
-    const submissionDate =
-      new Date().toLocaleString(
-        "en-IN",
-        {
-          timeZone: "Asia/Kolkata",
-        }
+    const numericIds = idRows
+      .slice(1)
+      .map((row) => Number(row[0]))
+      .filter(
+        (id) => Number.isSafeInteger(id) && id > 0
       );
 
-    // ==================================================
-    // CREATE ROW
-    // ==================================================
+    const candidateId =
+      (numericIds.length > 0
+        ? Math.max(...numericIds)
+        : 0) + 1;
 
+    const submissionDate = new Date().toLocaleString(
+      "en-IN",
+      {
+        timeZone: "Asia/Kolkata",
+      }
+    );
+
+    // Keep the existing 19-column sheet layout.
+    // Column Q is left blank; no AI summary is generated.
     const newRow = [
       candidateId,
       submissionDate,
 
-      fullName || "",
-      phone || "",
-      email || "",
-      location || "",
+      candidate.fullName,
+      candidate.phone,
+      candidate.email,
+      candidate.location,
 
-      qualification || "",
-      institution || "",
-      year || "",
+      candidate.qualification,
+      candidate.institution,
+      candidate.year,
 
-      company || "",
-      jobTitle || "",
-      startDate || "",
-      endDate || "",
-      experience || "",
+      candidate.company,
+      candidate.jobTitle,
+      candidate.startDate,
+      candidate.endDate,
+      candidate.experience,
 
-      achievements || "",
-      additionalInfo || "",
+      candidate.achievements,
+      candidate.additionalInfo,
 
-      "",
-
-      "Pending",
-
-      "",
+      "",          // Q: Unused
+      "Pending",   // R: Status
+      "",          // S: Recruiter Notes
     ];
-
-    // ==================================================
-    // SAVE TO GOOGLE SHEETS
-    // ==================================================
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-
       range: "Sheet1!A:S",
-
       valueInputOption: "USER_ENTERED",
-
       insertDataOption: "INSERT_ROWS",
-
       requestBody: {
         values: [newRow],
       },
     });
 
-    console.log(
-      `Candidate ${candidateId} saved to Google Sheets`
-    );
-
-    // ==================================================
-    // RESPOND IMMEDIATELY
-    // ==================================================
+    console.log(`Candidate ${candidateId} saved to Google Sheets`);
 
     res.status(201).json({
       success: true,
-
-      message:
-        "Candidate submitted successfully",
-
+      message: "Candidate submitted successfully",
       candidateId,
     });
-
-    // ==================================================
-    // AI SUMMARY IN BACKGROUND
-    // ==================================================
-
-    (async () => {
-      try {
-        console.log(
-          `Generating AI summary for candidate ${candidateId}...`
-        );
-
-        const aiSummary =
-          await generateAISummary(
-            candidate
-          );
-
-        console.log(
-          `AI summary generated for candidate ${candidateId}`
-        );
-
-        if (aiSummary) {
-          await sheets.spreadsheets.values.update({
-            spreadsheetId:
-              SPREADSHEET_ID,
-
-            range:
-              `Sheet1!Q${sheetRow}`,
-
-            valueInputOption:
-              "USER_ENTERED",
-
-            requestBody: {
-              values: [
-                [aiSummary],
-              ],
-            },
-          });
-
-          console.log(
-            `AI summary saved for candidate ${candidateId}`
-          );
-        }
-
-      } catch (aiError) {
-        console.error(
-          `AI processing failed for candidate ${candidateId}:`,
-          aiError.message
-        );
-      }
-    })();
-
   } catch (error) {
-    console.error(
-      "Candidate submission error:",
-      error
-    );
+    console.error("Candidate submission error:", error);
 
-    if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-
-        message:
-          "Failed to save candidate",
-
-        error:
-          error.message,
-      });
-    }
+    res.status(500).json({
+      success: false,
+      message: "Failed to save candidate",
+      error: error.message,
+    });
   }
 });
 

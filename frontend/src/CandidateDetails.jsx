@@ -12,45 +12,28 @@ function CandidateDetails({
     email: candidate.email || "",
     location: candidate.location || "",
 
-    qualification:
-      candidate.qualification || "",
-    institution:
-      candidate.institution || "",
-    year:
-      candidate.year || "",
+    qualification: candidate.qualification || "",
+    institution: candidate.institution || "",
+    year: candidate.year || "",
 
-    company:
-      candidate.company || "",
-    jobTitle:
-      candidate.jobTitle || "",
-    startDate:
-      candidate.startDate || "",
-    endDate:
-      candidate.endDate || "",
-    experience:
-      candidate.experience || "",
+    company: candidate.company || "",
+    jobTitle: candidate.jobTitle || "",
+    startDate: candidate.startDate || "",
+    endDate: candidate.endDate || "",
+    experience: candidate.experience || "",
 
-    achievements:
-      candidate.achievements || "",
+    achievements: candidate.achievements || "",
+    additionalInfo: candidate.additionalInfo || "",
 
-    additionalInfo:
-      candidate.additionalInfo || "",
-
-    status:
-      candidate.status || "Pending",
-
-    recruiterNotes:
-      candidate.recruiterNotes || "",
+    status: candidate.status || "Pending",
+    recruiterNotes: candidate.recruiterNotes || "",
   });
 
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  // ==============================
-  // HANDLE INPUT
-  // ==============================
-
+  // Handle form changes
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -63,10 +46,7 @@ function CandidateDetails({
     setError("");
   };
 
-  // ==============================
-  // SAVE
-  // ==============================
-
+  // Save candidate changes
   const handleSave = async (event) => {
     event.preventDefault();
 
@@ -79,12 +59,9 @@ function CandidateDetails({
         `http://localhost:5000/api/candidates/${candidate.candidateId}`,
         {
           method: "PUT",
-
           headers: {
-            "Content-Type":
-              "application/json",
+            "Content-Type": "application/json",
           },
-
           body: JSON.stringify(formData),
         }
       );
@@ -93,55 +70,34 @@ function CandidateDetails({
 
       if (!response.ok || !data.success) {
         throw new Error(
-          data.message ||
-            "Failed to update candidate"
+          data.message || "Failed to update candidate."
         );
       }
 
-      // Preserve backend information
       const updatedCandidate = {
         ...candidate,
-
         ...formData,
-
-        candidateId:
-          candidate.candidateId,
-
-        submissionDate:
-          candidate.submissionDate || "",
-
-        aiSummary:
-          candidate.aiSummary || "",
+        candidateId: candidate.candidateId,
+        submissionDate: candidate.submissionDate || "",
       };
 
-      setSuccess(
-        "Candidate updated successfully."
-      );
+      setSuccess("Candidate updated successfully.");
 
-      // Send updated candidate to dashboard
       if (onSaved) {
         onSaved(updatedCandidate);
       }
-
     } catch (error) {
-      console.error(
-        "Error updating candidate:",
-        error
-      );
+      console.error("Error updating candidate:", error);
 
       setError(
-        error.message ||
-          "Failed to update candidate."
+        error.message || "Failed to update candidate."
       );
     } finally {
       setSaving(false);
     }
   };
 
-  // ==============================
-  // BACK
-  // ==============================
-
+  // Return to CV preview
   const handleBack = () => {
     if (onBack) {
       onBack();
@@ -150,34 +106,16 @@ function CandidateDetails({
 
   return (
     <div className="candidate-details-page">
-
-      {/* =========================
-          HEADER
-          ========================= */}
-
+      {/* Header */}
       <div className="details-header">
-
         <div>
-
-          <h1>
-            Edit Candidate
-          </h1>
-
-          <p>
-            Candidate #
-            {candidate.candidateId}
-          </p>
-
+          <h1>Edit Candidate</h1>
+          <p>Candidate #{candidate.candidateId}</p>
         </div>
 
-
-        {/* STATUS */}
-
+        {/* Candidate status */}
         <div className="details-status">
-
-          <label htmlFor="status">
-            Status
-          </label>
+          <label htmlFor="status">Status</label>
 
           <select
             id="status"
@@ -185,30 +123,14 @@ function CandidateDetails({
             value={formData.status}
             onChange={handleChange}
           >
-
-            <option value="Pending">
-              Pending
-            </option>
-
-            <option value="Selected">
-              Selected
-            </option>
-
-            <option value="Rejected">
-              Rejected
-            </option>
-
+            <option value="Pending">Pending</option>
+            <option value="Selected">Selected</option>
+            <option value="Rejected">Rejected</option>
           </select>
-
         </div>
-
       </div>
 
-
-      {/* =========================
-          SUCCESS / ERROR
-          ========================= */}
-
+      {/* Success and error messages */}
       {success && (
         <div className="success-message">
           {success}
@@ -221,36 +143,23 @@ function CandidateDetails({
         </div>
       )}
 
-
       <form onSubmit={handleSave}>
-
-        {/* =========================
-            PERSONAL INFORMATION
-            ========================= */}
-
+        {/* Personal Information */}
         <section className="details-section">
-
-          <h2>
-            Personal Information
-          </h2>
+          <h2>Personal Information</h2>
 
           <div className="details-grid">
-
             <Field
               label="Full Name"
               name="fullName"
-              value={
-                formData.fullName
-              }
+              value={formData.fullName}
               onChange={handleChange}
             />
 
             <Field
               label="Phone Number"
               name="phone"
-              value={
-                formData.phone
-              }
+              value={formData.phone}
               onChange={handleChange}
             />
 
@@ -258,97 +167,63 @@ function CandidateDetails({
               label="Email"
               name="email"
               type="email"
-              value={
-                formData.email
-              }
+              value={formData.email}
               onChange={handleChange}
             />
 
             <Field
               label="Location"
               name="location"
-              value={
-                formData.location
-              }
+              value={formData.location}
               onChange={handleChange}
             />
-
           </div>
-
         </section>
 
-
-        {/* =========================
-            EDUCATION
-            ========================= */}
-
+        {/* Education */}
         <section className="details-section">
-
-          <h2>
-            Education
-          </h2>
+          <h2>Education</h2>
 
           <div className="details-grid">
-
             <Field
               label="Qualification"
               name="qualification"
-              value={
-                formData.qualification
-              }
+              value={formData.qualification}
               onChange={handleChange}
             />
 
             <Field
               label="Institution"
               name="institution"
-              value={
-                formData.institution
-              }
+              value={formData.institution}
               onChange={handleChange}
             />
 
             <Field
               label="Year of Passing"
               name="year"
-              value={
-                formData.year
-              }
+              value={formData.year}
               onChange={handleChange}
             />
-
           </div>
-
         </section>
 
-
-        {/* =========================
-            WORK EXPERIENCE
-            ========================= */}
-
+        {/* Work Experience */}
         <section className="details-section">
-
-          <h2>
-            Work Experience
-          </h2>
+          <h2>Work Experience</h2>
 
           <div className="details-grid">
-
             <Field
               label="Company"
               name="company"
-              value={
-                formData.company
-              }
+              value={formData.company}
               onChange={handleChange}
             />
 
             <Field
               label="Job Title"
               name="jobTitle"
-              value={
-                formData.jobTitle
-              }
+              value={formData.jobTitle}
               onChange={handleChange}
             />
 
@@ -356,9 +231,7 @@ function CandidateDetails({
               label="Start Date"
               name="startDate"
               type="date"
-              value={
-                formData.startDate
-              }
+              value={formData.startDate}
               onChange={handleChange}
             />
 
@@ -366,136 +239,61 @@ function CandidateDetails({
               label="End Date"
               name="endDate"
               type="date"
-              value={
-                formData.endDate
-              }
+              value={formData.endDate}
               onChange={handleChange}
             />
-
           </div>
-
 
           <TextAreaField
             label="Experience / Description"
             name="experience"
-            value={
-              formData.experience
-            }
+            value={formData.experience}
             onChange={handleChange}
             rows={5}
           />
-
         </section>
 
-
-        {/* =========================
-            ACHIEVEMENTS
-            ========================= */}
-
+        {/* Achievements */}
         <section className="details-section">
-
-          <h2>
-            Achievements
-          </h2>
+          <h2>Achievements</h2>
 
           <TextAreaField
             label="Achievements"
             name="achievements"
-            value={
-              formData.achievements
-            }
+            value={formData.achievements}
             onChange={handleChange}
             rows={5}
           />
-
         </section>
 
-
-        {/* =========================
-            ADDITIONAL INFORMATION
-            ========================= */}
-
+        {/* Additional Information */}
         <section className="details-section">
-
-          <h2>
-            Additional Information
-          </h2>
+          <h2>Additional Information</h2>
 
           <TextAreaField
             label="Additional Information"
             name="additionalInfo"
-            value={
-              formData.additionalInfo
-            }
+            value={formData.additionalInfo}
             onChange={handleChange}
             rows={5}
           />
-
         </section>
 
-
-        {/* =========================
-            AI SUMMARY
-            ========================= */}
-
+        {/* Recruiter Notes */}
         <section className="details-section">
-
-          <h2>
-            AI Summary
-          </h2>
-
-          <div className="ai-summary-box">
-
-            {candidate.aiSummary ? (
-              <p>
-                {candidate.aiSummary}
-              </p>
-            ) : (
-              <p className="no-summary">
-                AI summary is not available yet.
-              </p>
-            )}
-
-          </div>
-
-          <p className="field-help">
-            The AI summary is generated
-            automatically and cannot be
-            edited here.
-          </p>
-
-        </section>
-
-
-        {/* =========================
-            RECRUITER NOTES
-            ========================= */}
-
-        <section className="details-section">
-
-          <h2>
-            Recruiter Notes
-          </h2>
+          <h2>Recruiter Notes</h2>
 
           <TextAreaField
             label="Notes"
             name="recruiterNotes"
-            value={
-              formData.recruiterNotes
-            }
+            value={formData.recruiterNotes}
             onChange={handleChange}
             rows={5}
           />
-
         </section>
 
-
-        {/* =========================
-            ACTION BUTTONS
-            ========================= */}
-
+        {/* Action Buttons */}
         <div className="details-actions">
-
           <button
             type="button"
             className="back-button"
@@ -505,30 +303,20 @@ function CandidateDetails({
             ← Back to CV
           </button>
 
-
           <button
             type="submit"
             className="save-button"
             disabled={saving}
           >
-            {saving
-              ? "Saving..."
-              : "Save Changes"}
+            {saving ? "Saving..." : "Save Changes"}
           </button>
-
         </div>
-
       </form>
-
     </div>
   );
 }
 
-
-/* ==================================
-   INPUT COMPONENT
-   ================================== */
-
+/* Reusable input component */
 function Field({
   label,
   name,
@@ -538,10 +326,7 @@ function Field({
 }) {
   return (
     <div className="details-field">
-
-      <label htmlFor={name}>
-        {label}
-      </label>
+      <label htmlFor={name}>{label}</label>
 
       <input
         id={name}
@@ -550,16 +335,11 @@ function Field({
         value={value}
         onChange={onChange}
       />
-
     </div>
   );
 }
 
-
-/* ==================================
-   TEXTAREA COMPONENT
-   ================================== */
-
+/* Reusable textarea component */
 function TextAreaField({
   label,
   name,
@@ -569,10 +349,7 @@ function TextAreaField({
 }) {
   return (
     <div className="details-field full-width">
-
-      <label htmlFor={name}>
-        {label}
-      </label>
+      <label htmlFor={name}>{label}</label>
 
       <textarea
         id={name}
@@ -581,7 +358,6 @@ function TextAreaField({
         onChange={onChange}
         rows={rows}
       />
-
     </div>
   );
 }
